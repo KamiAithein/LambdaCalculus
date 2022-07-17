@@ -31,9 +31,18 @@ instance (Show rep) => Show (Expr rep) where
     show (Exprf f) = "(" ++ show f ++ ")"
     show (Expre el er) = "(" ++ show el ++ show er ++ ")"
 
-applyf :: (Eq rep) => Function rep -> Expr rep -> Expr rep
+data Repr base = Repr 
+    {
+        baseOf :: base,
+        reprOf :: Integer
+    }
+
+instance Eq (Repr rep) where
+    rl == rr = reprOf rl == reprOf rr
+
+applyf :: (Eq rep) => Function (Repr rep) -> Expr (Repr rep) -> Expr (Repr rep)
 applyf (Function p b) a = subWith p a b
-    where subWith :: (Eq rep) => Variable rep -> Expr rep -> Expr rep -> Expr rep
+    where subWith :: (Eq rep) => Variable (Repr rep) -> Expr (Repr rep) -> Expr (Repr rep) -> Expr (Repr rep)
           -- (p.p)a = a
           -- (p.b)a = b
           subWith p a body@(Exprv b) | p == b    = a
